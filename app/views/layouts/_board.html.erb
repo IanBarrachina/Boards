@@ -1,0 +1,32 @@
+<script type="text/javascript">
+
+  window.onload = function() {
+
+    var game = new Phaser.Game(640, 640, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+
+    function preload() {
+      game.load.image('black-tile', "<%= asset_path('black.jpg') %>");
+      game.load.image('white-tile', "<%= asset_path('white.jpg') %>");
+    }
+
+    function create() {
+      for (i = 0; i < 8; i++){
+        for (j = 0; j < 8; j++){
+          if((i+j)%2 == 0){
+            var tile = game.add.sprite(i*80, j*80, 'white-tile');
+          }else{
+            var tile = game.add.sprite(i*80, j*80, 'black-tile');
+          }
+          tile.scale.setTo(0.2, 0.2);
+        }
+      }
+
+    }
+
+    function update () {
+
+    }
+
+  };
+
+</script>
