@@ -3,7 +3,9 @@
 # You can use CoffeeScript in this file: http://coffeescript.org/
 
 $(document).ready ->
-	$("#create_board").click ->
+	$("#super_hexagon").click ->
 		$("#board").empty()
 		create_super_hexagon()
-		alert($('input[name="category"]:checked').val())
+	$("#hexagon_grid").click ->
+		$("#board").empty()
+		create_hexagon_grid()
