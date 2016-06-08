@@ -1,94 +1,72 @@
-<%= radio_button("mode", "category", "rails") %>
-<%= label_tag "Hexagon Grid" %><br />
-<%= radio_button("mode", "category", "java") %>
-<%= label_tag "Super Hexagon" %><br />
+<%= radio_button_tag(:board_type, "hex_grid") %>
+<%= label_tag "Hexagon Grid" %>
+<%= number_field_tag 'gridSizeX', 5, min: 1, max: 10 %>x
+<%= number_field_tag 'gridSizeY', 5, min: 1, max: 10 %><br />
+<%= radio_button_tag(:board_type, "hex_super") %>
+<%= label_tag "Super Hexagon" %>
+<%= number_field_tag 'sideSize', 5, min: 1, max: 10 %><br />
 <%= button_tag "Create Board", id: "create_board" %>
 <%= content_tag(:div, "", id: "board") %>
 
 <script type="text/javascript">
-  function create_super_hexagon() {
-    var game = new Phaser.Game(640, 480, Phaser.CANVAS, "board", {preload: preload, create: create, update: update, render: render});
+  var hexagonWidth = 55;
+  var hexagonHeight = 40;
+  var sideSize = 6;
+  var gridSizeX = 6;
+  var gridSizeY = 6;
+  var hexagonGroup;
+  var game;
+  var tiles = [];
 
-    var hexagonWidth = 55;
-    var hexagonHeight = 40;
-    var sideSize = 6;
-    var hexagonGroup;
-    var tiles = [];
+  function create_board(){
+    $("#board").empty();
+    var type = $('input[name="board_type"]:checked').val();
 
-    function preload() {
-      tiles.push(["rockDirt", "<%= asset_path('hexagonTiles/Tiles/rockDirt.png') %>"])
-      tiles.push(["rockDirtmoss1", "<%= asset_path('hexagonTiles/Tiles/rockDirt_moss1.png') %>"])
-      tiles.push(["rockDirt_moss2", "<%= asset_path('hexagonTiles/Tiles/rockDirt_moss2.png') %>"])
-      tiles.push(["rockDirt_moss3", "<%= asset_path('hexagonTiles/Tiles/rockDirt_moss3.png') %>"])
-      tiles.push(["rockSnow1", "<%= asset_path('hexagonTiles/Tiles/rockSnow_1.png') %>"])
-      tiles.push(["rockSnow3", "<%= asset_path('hexagonTiles/Tiles/rockSnow_2.png') %>"])
-      tiles.push(["rockSnow3", "<%= asset_path('hexagonTiles/Tiles/rockSnow_3.png') %>"])
-      tiles.push(["rockStone", "<%= asset_path('hexagonTiles/Tiles/rockStone.png') %>"])
-      tiles.push(["rockStone_moss1", "<%= asset_path('hexagonTiles/Tiles/rockStone_moss1.png') %>"])
-      tiles.push(["rockStone_moss2", "<%= asset_path('hexagonTiles/Tiles/rockStone_moss2.png') %>"])
-      tiles.push(["rockStone_moss3", "<%= asset_path('hexagonTiles/Tiles/rockStone_moss3.png') %>"])
-      
-      for (i=0; i<tiles.length; i++){
-        game.load.image(tiles[i][0], tiles[i][1]);
-      }
-    }
-
-    function create() {
-      game.stage.backgroundColor = "#ffffff"
-      hexagonGroup = game.add.group();
-      //hexagon_grid(hexagonGroup, game, gridSizeX, gridSizeY, hexagonWidth, hexagonHeight, tiles);
-      super_hexagon(hexagonGroup, game, sideSize, hexagonWidth, hexagonHeight, tiles);
-    }
-
-    function update() {
-    }
-
-    function render() {
+    switch (type){
+      case "hex_grid":
+        gridSizeX = $('#gridSizeX').val()
+        gridSizeY = $('#gridSizeY').val()
+        game = new Phaser.Game(640, 480, Phaser.CANVAS, "board", {preload: preload_hex, create: create_hex_grid, update: update, render: render});
+        break;
+      case "hex_super":
+        sideSize = $('#sideSize').val()
+        game = new Phaser.Game(640, 480, Phaser.CANVAS, "board", {preload: preload_hex, create: create_hex_super, update: update, render: render});
+        break;
+      default:
+        alert("No option selected");
     }
   }
 
-  function create_hexagon_grid() {
-    var game = new Phaser.Game(640, 480, Phaser.CANVAS, "board", {preload: preload, create: create, update: update, render: render});
-
-    var hexagonWidth = 55;
-    var hexagonHeight = 40;
-    var gridSizeX = 20;
-    var gridSizeY = 20;
-    var hexagonGroup;
-    var tiles = [];
-
-    function preload() {
-      tiles.push(["rockDirt", "<%= asset_path('hexagonTiles/Tiles/rockDirt.png') %>"])
-      tiles.push(["rockDirtmoss1", "<%= asset_path('hexagonTiles/Tiles/rockDirt_moss1.png') %>"])
-      tiles.push(["rockDirt_moss2", "<%= asset_path('hexagonTiles/Tiles/rockDirt_moss2.png') %>"])
-      tiles.push(["rockDirt_moss3", "<%= asset_path('hexagonTiles/Tiles/rockDirt_moss3.png') %>"])
-      tiles.push(["rockSnow1", "<%= asset_path('hexagonTiles/Tiles/rockSnow_1.png') %>"])
-      tiles.push(["rockSnow3", "<%= asset_path('hexagonTiles/Tiles/rockSnow_2.png') %>"])
-      tiles.push(["rockSnow3", "<%= asset_path('hexagonTiles/Tiles/rockSnow_3.png') %>"])
-      tiles.push(["rockStone", "<%= asset_path('hexagonTiles/Tiles/rockStone.png') %>"])
-      tiles.push(["rockStone_moss1", "<%= asset_path('hexagonTiles/Tiles/rockStone_moss1.png') %>"])
-      tiles.push(["rockStone_moss2", "<%= asset_path('hexagonTiles/Tiles/rockStone_moss2.png') %>"])
-      tiles.push(["rockStone_moss3", "<%= asset_path('hexagonTiles/Tiles/rockStone_moss3.png') %>"])
-      
-      for (i=0; i<tiles.length; i++){
-        game.load.image(tiles[i][0], tiles[i][1]);
-      }
-    }
-
-    function create() {
-      game.stage.backgroundColor = "#ffffff"
-      hexagonGroup = game.add.group();
-      hexagon_grid(hexagonGroup, game, gridSizeX, gridSizeY, hexagonWidth, hexagonHeight, tiles);
-    }
-
-    function update() {
-    }
-
-    function render() {
+  function preload_hex() {
+    tiles.push(["rockDirt_moss3", "<%= asset_path('hexagonTiles/Tiles/tileGrass_tile.png') %>"])
+    tiles.push(["rockSnow3", "<%= asset_path('hexagonTiles/Tiles/tileWater_tile.png') %>"])
+    tiles.push(["rockStone", "<%= asset_path('hexagonTiles/Tiles/tileRock_tile.png') %>"])
+    
+    for (i=0; i<tiles.length; i++){
+      game.load.image(tiles[i][0], tiles[i][1]);
     }
   }
 
-  function hexagon_grid(hexagonGroup, game, gridSizeX, gridSizeY, hexagonWidth, hexagonHeight, tiles){
+  function create_hex_super() {
+    game.stage.backgroundColor = "#ffffff"
+    hexagonGroup = game.add.group();
+    //hexagon_grid(hexagonGroup, game, gridSizeX, gridSizeY, hexagonWidth, hexagonHeight, tiles);
+    hex_super(hexagonGroup, game, sideSize, hexagonWidth, hexagonHeight, tiles);
+  }
+
+  function create_hex_grid() {
+    game.stage.backgroundColor = "#ffffff"
+    hexagonGroup = game.add.group();
+    hex_grid(hexagonGroup, game, gridSizeX, gridSizeY, hexagonWidth, hexagonHeight, tiles);
+  }
+
+  function update() {
+  }
+
+  function render() {
+  }
+
+  function hex_grid(hexagonGroup, game, gridSizeX, gridSizeY, hexagonWidth, hexagonHeight, tiles){
       for(var j = 0; j < gridSizeY; j ++){
         for(var i = 0; i < gridSizeX; i ++){
           if(j%2==1){
@@ -96,25 +74,36 @@
           }else{
             var offset = 0;
           }
-          hexagonGroup.add(game.add.sprite(hexagonWidth*i+offset,hexagonHeight*j,tiles[Math.floor(Math.random()*tiles.length)][0]));
+          switch((i-(j%2)+3)%3){
+            case 0:
+              var tile = tiles[0];
+              break;
+            case 1:
+              var tile = tiles[1];
+              break;
+            case 2:
+              var tile = tiles[2];
+              break;
+          } 
+          hexagonGroup.add(game.add.sprite(hexagonWidth*i+offset,hexagonHeight*j,tile[0]));
         }
       }
   }
 
-  function super_hexagon(hexagonGroup, game, sideSize, hexagonWidth, hexagonHeight, tiles){
+  function hex_super(hexagonGroup, game, sideSize, hexagonWidth, hexagonHeight, tiles){
     var max = sideSize*2-1;
     for(var j = 0; j < max; j ++){
       for(var i = 0; i < max-Math.abs(sideSize-j-1); i ++){
         var offset = Math.abs(sideSize-j-1)*hexagonWidth/2;
         switch((2*i+Math.abs(sideSize-j-1))%3){
           case 0:
-            var tile = tiles[3];
+            var tile = tiles[0];
             break;
           case 1:
-            var tile = tiles[6];
+            var tile = tiles[1];
             break;
           case 2:
-            var tile = tiles[7];
+            var tile = tiles[2];
             break;
         }
         hexagonGroup.add(game.add.sprite(hexagonWidth*i+offset,hexagonHeight*j,tile[0]));

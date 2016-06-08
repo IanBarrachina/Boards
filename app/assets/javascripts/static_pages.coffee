@@ -4,6 +4,4 @@
 
 $(document).ready ->
 	$("#create_board").click ->
-		$("#board").empty()
-		create_super_hexagon()
-		alert($('input[name="category"]:checked').val())
+		create_board()
