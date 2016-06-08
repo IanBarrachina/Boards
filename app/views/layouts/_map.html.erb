@@ -1,43 +1,73 @@
+<%= radio_button_tag(:board_type, "sqr_grid") %>
+<%= label_tag "Square Grid" %>
+<%= number_field_tag 'sqrGridSizeX', 8, class: "input_size", min: 1, max: 20 %>x
+<%= number_field_tag 'sqrGridSizeY', 8, class: "input_size", min: 1, max: 20 %><br />
 <%= radio_button_tag(:board_type, "hex_grid") %>
 <%= label_tag "Hexagon Grid" %>
-<%= number_field_tag 'gridSizeX', 5, min: 1, max: 10 %>x
-<%= number_field_tag 'gridSizeY', 5, min: 1, max: 10 %><br />
+<%= number_field_tag 'hexGridSizeX', 8, class: "input_size", min: 1, max: 20 %>x
+<%= number_field_tag 'hexGridSizeY', 10, class: "input_size", min: 1, max: 20 %><br />
 <%= radio_button_tag(:board_type, "hex_super") %>
 <%= label_tag "Super Hexagon" %>
-<%= number_field_tag 'sideSize', 5, min: 1, max: 10 %><br />
+<%= number_field_tag 'hexSideSize', 5, class: "input_size", min: 1, max: 10 %><br />
 <%= button_tag "Create Board", id: "create_board" %>
 <%= content_tag(:div, "", id: "board") %>
 
 <script type="text/javascript">
-  var hexagonWidth = 55;
-  var hexagonHeight = 40;
+  const SQR_SIZE_X = 64;
+  const SQR_SIZE_Y = 64;
+  const HEX_SIZE_X = 55;
+  const HEX_SIZE_Y = 40;
+
+  var tileWidth;
+  var tileHeight;
   var sideSize = 6;
   var gridSizeX = 6;
   var gridSizeY = 6;
-  var hexagonGroup;
+  var tileGroup;
   var game;
   var tiles = [];
 
   function create_board(){
     $("#board").empty();
+    tiles = [];
     var type = $('input[name="board_type"]:checked').val();
 
     switch (type){
+      case "sqr_grid":
+        gridSizeX = $('#sqrGridSizeX').val();
+        gridSizeY = $('#sqrGridSizeY').val();
+        game = new Phaser.Game(gridSizeX*SQR_SIZE_X, gridSizeY*SQR_SIZE_Y, Phaser.CANVAS, "board", {preload: preload_sqr, create: create_sqr_grid, update: update, render: render});
+        break;
       case "hex_grid":
-        gridSizeX = $('#gridSizeX').val()
-        gridSizeY = $('#gridSizeY').val()
-        game = new Phaser.Game(640, 480, Phaser.CANVAS, "board", {preload: preload_hex, create: create_hex_grid, update: update, render: render});
+        gridSizeX = $('#hexGridSizeX').val();
+        gridSizeY = $('#hexGridSizeY').val();
+        game = new Phaser.Game((gridSizeX+1)*HEX_SIZE_X, (gridSizeY+1)*HEX_SIZE_Y, Phaser.CANVAS, "board", {preload: preload_hex, create: create_hex_grid, update: update, render: render});
         break;
       case "hex_super":
-        sideSize = $('#sideSize').val()
-        game = new Phaser.Game(640, 480, Phaser.CANVAS, "board", {preload: preload_hex, create: create_hex_super, update: update, render: render});
+        sideSize = $('#hexSideSize').val();
+        game = new Phaser.Game((sideSize+1)*HEX_SIZE_X, (sideSize+1)*HEX_SIZE_Y, Phaser.CANVAS, "board", {preload: preload_hex, create: create_hex_super, update: update, render: render});
         break;
       default:
         alert("No option selected");
     }
   }
 
+  function preload_sqr() {
+    tileWidth = SQR_SIZE_X;
+    tileHeight = SQR_SIZE_Y;
+
+    tiles.push(["white", "<%= asset_path('kenneyrpgpack/PNG/rpgTile052.png') %>"])
+    tiles.push(["black", "<%= asset_path('kenneyrpgpack/PNG/rpgTile133.png') %>"])
+    
+    for (i=0; i<tiles.length; i++){
+      game.load.image(tiles[i][0], tiles[i][1]);
+    }
+  }
+
   function preload_hex() {
+    tileWidth = HEX_SIZE_X;
+    tileHeight = HEX_SIZE_Y;
+
     tiles.push(["rockDirt_moss3", "<%= asset_path('hexagonTiles/Tiles/tileGrass_tile.png') %>"])
     tiles.push(["rockSnow3", "<%= asset_path('hexagonTiles/Tiles/tileWater_tile.png') %>"])
     tiles.push(["rockStone", "<%= asset_path('hexagonTiles/Tiles/tileRock_tile.png') %>"])
@@ -46,18 +76,23 @@
       game.load.image(tiles[i][0], tiles[i][1]);
     }
   }
-
   function create_hex_super() {
     game.stage.backgroundColor = "#ffffff"
-    hexagonGroup = game.add.group();
-    //hexagon_grid(hexagonGroup, game, gridSizeX, gridSizeY, hexagonWidth, hexagonHeight, tiles);
-    hex_super(hexagonGroup, game, sideSize, hexagonWidth, hexagonHeight, tiles);
+    tileGroup = game.add.group();
+    //hexagon_grid(tileGroup, game, gridSizeX, gridSizeY, tileWidth, tileHeight, tiles);
+    hex_super(tileGroup, game, sideSize, tileWidth, tileHeight, tiles);
   }
 
   function create_hex_grid() {
     game.stage.backgroundColor = "#ffffff"
-    hexagonGroup = game.add.group();
-    hex_grid(hexagonGroup, game, gridSizeX, gridSizeY, hexagonWidth, hexagonHeight, tiles);
+    tileGroup = game.add.group();
+    hex_grid(tileGroup, game, gridSizeX, gridSizeY, tileWidth, tileHeight, tiles);
+  }
+
+  function create_sqr_grid() {
+    game.stage.backgroundColor = "#ffffff"
+    tileGroup = game.add.group();
+    sqr_grid(tileGroup, game, gridSizeX, gridSizeY, tileWidth, tileHeight, tiles);
   }
 
   function update() {
@@ -66,11 +101,11 @@
   function render() {
   }
 
-  function hex_grid(hexagonGroup, game, gridSizeX, gridSizeY, hexagonWidth, hexagonHeight, tiles){
+  function hex_grid(tileGroup, game, gridSizeX, gridSizeY, tileWidth, tileHeight, tiles){
       for(var j = 0; j < gridSizeY; j ++){
         for(var i = 0; i < gridSizeX; i ++){
           if(j%2==1){
-            var offset = hexagonWidth/2;
+            var offset = tileWidth/2;
           }else{
             var offset = 0;
           }
@@ -85,16 +120,16 @@
               var tile = tiles[2];
               break;
           } 
-          hexagonGroup.add(game.add.sprite(hexagonWidth*i+offset,hexagonHeight*j,tile[0]));
+          tileGroup.add(game.add.sprite(tileWidth*i+offset,tileHeight*j,tile[0]));
         }
       }
   }
 
-  function hex_super(hexagonGroup, game, sideSize, hexagonWidth, hexagonHeight, tiles){
+  function hex_super(tileGroup, game, sideSize, tileWidth, tileHeight, tiles){
     var max = sideSize*2-1;
     for(var j = 0; j < max; j ++){
       for(var i = 0; i < max-Math.abs(sideSize-j-1); i ++){
-        var offset = Math.abs(sideSize-j-1)*hexagonWidth/2;
+        var offset = Math.abs(sideSize-j-1)*tileWidth/2;
         switch((2*i+Math.abs(sideSize-j-1))%3){
           case 0:
             var tile = tiles[0];
@@ -106,8 +141,26 @@
             var tile = tiles[2];
             break;
         }
-        hexagonGroup.add(game.add.sprite(hexagonWidth*i+offset,hexagonHeight*j,tile[0]));
+        tileGroup.add(game.add.sprite(tileWidth*i+offset,tileHeight*j,tile[0]));
       }
     }
   }
+
+  function sqr_grid(tileGroup, game, gridSizeX, gridSizeY, tileWidth, tileHeight, tiles){
+      for(var j = 0; j < gridSizeY; j ++){
+        for(var i = 0; i < gridSizeX; i ++){
+          switch((i+j)%2){
+            case 0:
+              var tile = tiles[0];
+              break;
+            case 1:
+              var tile = tiles[1];
+              break;
+              break;
+          } 
+          tileGroup.add(game.add.sprite(tileWidth*i,tileHeight*j,tile[0]));
+        }
+      }
+  }
+
 </script>
