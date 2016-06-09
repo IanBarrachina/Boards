@@ -5,3 +5,5 @@
 $(document).ready ->
 	$("#create_board").click ->
 		create_board()
+	$("#create_tokens").click ->
+		create_tokens($('#wite_tokens').val(), $('#black_tokens').val())

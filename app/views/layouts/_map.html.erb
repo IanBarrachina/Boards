@@ -1,17 +1,25 @@
-<%= radio_button_tag(:board_type, "sqr_grid") %>
-<%= label_tag "Square Grid" %>
-<%= number_field_tag 'sqrGridSizeX', 8, class: "input_size", min: 1, max: 20 %>x
-<%= number_field_tag 'sqrGridSizeY', 8, class: "input_size", min: 1, max: 20 %><br />
-<%= radio_button_tag(:board_type, "hex_grid") %>
-<%= label_tag "Hexagon Grid" %>
-<%= number_field_tag 'hexGridSizeX', 8, class: "input_size", min: 1, max: 20 %>x
-<%= number_field_tag 'hexGridSizeY', 10, class: "input_size", min: 1, max: 20 %><br />
-<%= radio_button_tag(:board_type, "hex_super") %>
-<%= label_tag "Super Hexagon" %>
-<%= number_field_tag 'hexSideSize', 5, class: "input_size", min: 1, max: 10 %><br />
-<%= button_tag "Create Board", id: "create_board" %>
+<div class="left_content">
+  <%= radio_button_tag(:board_type, "sqr_grid") %>
+  <%= label_tag "Square Grid" %>
+  <%= number_field_tag 'sqrGridSizeX', 8, class: "input_size", min: 1, max: 20 %>x
+  <%= number_field_tag 'sqrGridSizeY', 8, class: "input_size", min: 1, max: 20 %><br />
+  <%= radio_button_tag(:board_type, "hex_grid") %>
+  <%= label_tag "Hexagon Grid" %>
+  <%= number_field_tag 'hexGridSizeX', 8, class: "input_size", min: 1, max: 20 %>x
+  <%= number_field_tag 'hexGridSizeY', 10, class: "input_size", min: 1, max: 20 %><br />
+  <%= radio_button_tag(:board_type, "hex_super") %>
+  <%= label_tag "Super Hexagon" %>
+  <%= number_field_tag 'hexSideSize', 5, class: "input_size", min: 1, max: 10 %><br />
+  <%= button_tag "Create Board", id: "create_board" %>
+</div>
+<div class="rigth_content">
+  <%= label_tag "White Token" %>
+  <%= number_field_tag 'wite_tokens', 0, class: "input_size", min: 0, max: 20 %><br />
+  <%= label_tag "Black Token" %>
+  <%= number_field_tag 'black_tokens', 0, class: "input_size", min: 0, max: 20 %><br />
+  <%= button_tag "Create Tokens", id: "create_tokens" %>
+</div>
 <%= content_tag(:div, "", id: "board") %>
-
 <script type="text/javascript">
   const SQR_SIZE_X = 64;
   const SQR_SIZE_Y = 64;
@@ -24,8 +32,10 @@
   var gridSizeX = 6;
   var gridSizeY = 6;
   var tileGroup;
+  var tokenGroup;
   var game;
   var tiles = [];
+  var tokens = [];
 
   function create_board(){
     $("#board").empty();
@@ -56,11 +66,18 @@
     tileWidth = SQR_SIZE_X;
     tileHeight = SQR_SIZE_Y;
 
-    tiles.push(["white", "<%= asset_path('kenneyrpgpack/PNG/rpgTile052.png') %>"])
-    tiles.push(["black", "<%= asset_path('kenneyrpgpack/PNG/rpgTile133.png') %>"])
+    tiles.push(["white_tile", "<%= asset_path('kenneyrpgpack/PNG/rpgTile052.png') %>"])
+    tiles.push(["black_tile", "<%= asset_path('kenneyrpgpack/PNG/rpgTile133.png') %>"])
+
+    tokens.push(["white_token", "<%= asset_path('boardgamepack/PNG/Pieces (White)/pieceWhite_border11.png') %>"])
+    tokens.push(["black_token", "<%= asset_path('boardgamepack/PNG/Pieces (Black)/pieceBlack_border11.png') %>"])
     
     for (i=0; i<tiles.length; i++){
       game.load.image(tiles[i][0], tiles[i][1]);
+    }
+
+    for (i=0; i<tokens.length; i++){
+      game.load.image(tokens[i][0], tokens[i][1]);
     }
   }
 
@@ -71,27 +88,38 @@
     tiles.push(["rockDirt_moss3", "<%= asset_path('hexagonTiles/Tiles/tileGrass_tile.png') %>"])
     tiles.push(["rockSnow3", "<%= asset_path('hexagonTiles/Tiles/tileWater_tile.png') %>"])
     tiles.push(["rockStone", "<%= asset_path('hexagonTiles/Tiles/tileRock_tile.png') %>"])
+
+    tokens.push(["white_token", "<%= asset_path('boardgamepack/PNG/Pieces (White)/pieceWhite_border11.png') %>"])
+    tokens.push(["black_token", "<%= asset_path('boardgamepack/PNG/Pieces (Black)/pieceBlack_border11.png') %>"])
     
     for (i=0; i<tiles.length; i++){
       game.load.image(tiles[i][0], tiles[i][1]);
     }
+
+    for (i=0; i<tokens.length; i++){
+      game.load.image(tokens[i][0], tokens[i][1]);
+    }    
   }
   function create_hex_super() {
     game.stage.backgroundColor = "#ffffff"
     tileGroup = game.add.group();
+    tokenGroup = game.add.group();
     //hexagon_grid(tileGroup, game, gridSizeX, gridSizeY, tileWidth, tileHeight, tiles);
     hex_super(tileGroup, game, sideSize, tileWidth, tileHeight, tiles);
+
   }
 
   function create_hex_grid() {
     game.stage.backgroundColor = "#ffffff"
     tileGroup = game.add.group();
+    tokenGroup = game.add.group();
     hex_grid(tileGroup, game, gridSizeX, gridSizeY, tileWidth, tileHeight, tiles);
   }
 
   function create_sqr_grid() {
     game.stage.backgroundColor = "#ffffff"
     tileGroup = game.add.group();
+    tokenGroup = game.add.group();
     sqr_grid(tileGroup, game, gridSizeX, gridSizeY, tileWidth, tileHeight, tiles);
   }
 
@@ -161,6 +189,23 @@
           tileGroup.add(game.add.sprite(tileWidth*i,tileHeight*j,tile[0]));
         }
       }
+  }
+
+  function create_tokens(white, black){
+    var token_list = [];
+    for (i = 0; i < white; i++){
+      token_list.push(game.add.sprite(0,0,tokens[0][0]));
+    }
+    
+    for (i = 0; i < black; i++){
+      token_list.push(game.add.sprite(0,0,tokens[1][0]));
+    }
+
+    for (i = 0; i < token_list.length; i++){
+      token_list[i].inputEnabled = true;
+      token_list[i].input.enableDrag(true);
+      tokenGroup.add(token_list[i]);
+    }
   }
 
 </script>
