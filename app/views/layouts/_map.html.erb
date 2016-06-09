@@ -1,25 +1,28 @@
-<div class="left_content">
-  <%= radio_button_tag(:board_type, "sqr_grid") %>
-  <%= label_tag "Square Grid" %>
-  <%= number_field_tag 'sqrGridSizeX', 8, class: "input_size", min: 1, max: 20 %>x
-  <%= number_field_tag 'sqrGridSizeY', 8, class: "input_size", min: 1, max: 20 %><br />
-  <%= radio_button_tag(:board_type, "hex_grid") %>
-  <%= label_tag "Hexagon Grid" %>
-  <%= number_field_tag 'hexGridSizeX', 8, class: "input_size", min: 1, max: 20 %>x
-  <%= number_field_tag 'hexGridSizeY', 10, class: "input_size", min: 1, max: 20 %><br />
-  <%= radio_button_tag(:board_type, "hex_super") %>
-  <%= label_tag "Super Hexagon" %>
-  <%= number_field_tag 'hexSideSize', 5, class: "input_size", min: 1, max: 10 %><br />
-  <%= button_tag "Create Board", id: "create_board" %>
+<div class="row">
+  <div class="col-md-1"></div>
+  <div class="col-md-2">
+    <%= radio_button_tag(:board_type, "sqr_grid") %>
+    <%= label_tag "Square Grid" %>
+    <%= number_field_tag 'sqrGridSizeX', 8, class: "input_size", min: 1, max: 20 %>x
+    <%= number_field_tag 'sqrGridSizeY', 8, class: "input_size", min: 1, max: 20 %><br />
+    <%= radio_button_tag(:board_type, "hex_grid") %>
+    <%= label_tag "Hexagon Grid" %>
+    <%= number_field_tag 'hexGridSizeX', 8, class: "input_size", min: 1, max: 20 %>x
+    <%= number_field_tag 'hexGridSizeY', 10, class: "input_size", min: 1, max: 20 %><br />
+    <%= radio_button_tag(:board_type, "hex_super") %>
+    <%= label_tag "Super Hexagon" %>
+    <%= number_field_tag 'hexSideSize', 5, class: "input_size", min: 1, max: 10 %><br />
+    <%= button_tag "Create Board", id: "create_board" %>
+  </div>
+  <div class="col-md-2">
+    <%= label_tag "White Token" %>
+    <%= number_field_tag 'wite_tokens', 0, class: "input_size", min: 0, max: 20 %><br />
+    <%= label_tag "Black Token" %>
+    <%= number_field_tag 'black_tokens', 0, class: "input_size", min: 0, max: 20 %><br />
+    <%= button_tag "Create Tokens", id: "create_tokens" %>
+  </div>
 </div>
-<div class="rigth_content">
-  <%= label_tag "White Token" %>
-  <%= number_field_tag 'wite_tokens', 0, class: "input_size", min: 0, max: 20 %><br />
-  <%= label_tag "Black Token" %>
-  <%= number_field_tag 'black_tokens', 0, class: "input_size", min: 0, max: 20 %><br />
-  <%= button_tag "Create Tokens", id: "create_tokens" %>
-</div>
-<%= content_tag(:div, "", id: "board") %>
+<%= content_tag(:div, "", id: "board", class: "left_content") %>
 <script type="text/javascript">
   const SQR_SIZE_X = 64;
   const SQR_SIZE_Y = 64;
