@@ -1,6 +1,6 @@
 <div class="row">
-  <div class="col-md-1"></div>
-  <div class="col-md-2">
+  <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1"></div>
+  <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
     <%= radio_button_tag(:board_type, "sqr_grid") %>
     <%= label_tag "Square Grid" %>
     <%= number_field_tag 'sqrGridSizeX', 8, class: "input_size", min: 1, max: 20 %>x
@@ -14,7 +14,7 @@
     <%= number_field_tag 'hexSideSize', 5, class: "input_size", min: 1, max: 10 %><br />
     <%= button_tag "Create Board", id: "create_board" %>
   </div>
-  <div class="col-md-2">
+  <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
     <%= label_tag "White Token" %>
     <%= number_field_tag 'wite_tokens', 0, class: "input_size", min: 0, max: 20 %><br />
     <%= label_tag "Black Token" %>
